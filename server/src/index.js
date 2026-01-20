@@ -5,6 +5,8 @@ import weatherRoutes from './routes/weather.routes.js';
 
 dotenv.config();
 
+console.log('API Key loaded:', process.env.WEATHER_API_KEY ? 'Yes' : 'No');
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 

@@ -1,10 +1,16 @@
 import axios from 'axios';
 import cache from '../cache/cacheManager.js';
 
-const API_KEY = process.env.WEATHER_API_KEY;
 const BASE_URL = 'https://api.openweathermap.org/data/2.5/weather';
 
 export const getWeather = async (city) => {
+  const API_KEY = process.env.WEATHER_API_KEY;
+  console.log('Using API key:', API_KEY ? 'Found' : 'Missing');
+  
+  if (!API_KEY) {
+    throw new Error('WEATHER_API_KEY not found in environment variables');
+  }
+
   const cacheKey = `weather_${city.toLowerCase()}`;
   const cached = cache.get(cacheKey);
   
