@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NewsSkeleton } from './LoadingSkeleton';
 import ErrorState from './ErrorState';
+import StatusIndicator from './StatusIndicator';
 
 const NewsWidget = () => {
   const [news, setNews] = useState([]);
@@ -8,18 +9,24 @@ const NewsWidget = () => {
   const [error, setError] = useState(null);
   const [topic, setTopic] = useState('tech');
   const [page, setPage] = useState(1);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [status, setStatus] = useState('loading');
 
   const fetchNews = async (newTopic = topic, newPage = 1) => {
     try {
       setLoading(true);
       setError(null);
+      setStatus('loading');
       const response = await fetch(`http://localhost:5000/api/news?topic=${newTopic}&page=${newPage}&pageSize=5`);
       if (!response.ok) throw new Error('Failed to fetch news');
       const data = await response.json();
       setNews(data.articles || []);
       setPage(newPage);
+      setLastUpdated(new Date());
+      setStatus('online');
     } catch (err) {
       setError(err.message);
+      setStatus('offline');
     } finally {
       setLoading(false);
     }
@@ -39,8 +46,11 @@ const NewsWidget = () => {
 
   return (
     <div className="card">
-      <div className="card-header">
-        <h3>Latest News</h3>
+      <div className="card-header-with-status">
+        <div className="card-title-section">
+          <h3>📰 Latest News</h3>
+          <StatusIndicator status={status} lastUpdated={lastUpdated} />
+        </div>
         <div className="topic-tabs">
           {['tech', 'business', 'science'].map(t => (
             <button

@@ -8,20 +8,33 @@ import './styles/Dashboard.css';
 const Dashboard = () => {
   const { isDark, toggleTheme } = useTheme();
   const [refreshKey, setRefreshKey] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
     setRefreshKey(prev => prev + 1);
+    // Simulate refresh delay for better UX
+    setTimeout(() => setIsRefreshing(false), 1000);
   };
 
   return (
     <div className="dashboard">
       <div className="dashboard-header">
-        <h1 className="dashboard-title">API Aggregator Dashboard</h1>
+        <div>
+          <h1 className="dashboard-title">API Aggregator Dashboard</h1>
+          <p style={{ color: 'var(--text-secondary)', margin: '8px 0 0 0', fontSize: '16px' }}>
+            Real-time data from multiple APIs
+          </p>
+        </div>
         <div className="dashboard-controls">
-          <button className="btn refresh-btn" onClick={handleRefresh}>
-            🔄 Refresh
+          <button 
+            className={`btn refresh-btn ${isRefreshing ? 'refreshing' : ''}`} 
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+          >
+            🔄 {isRefreshing ? 'Refreshing...' : 'Refresh All'}
           </button>
-          <button className="theme-toggle" onClick={toggleTheme}>
+          <button className="theme-toggle" onClick={toggleTheme} title={`Switch to ${isDark ? 'light' : 'dark'} mode`}>
             {isDark ? '☀️' : '🌙'}
           </button>
         </div>
@@ -32,6 +45,16 @@ const Dashboard = () => {
         <NewsWidget />
         <CryptoWidget />
       </div>
+      
+      {/* Floating Action Button */}
+      <button 
+        className="fab" 
+        onClick={handleRefresh}
+        title="Refresh all data"
+        disabled={isRefreshing}
+      >
+        {isRefreshing ? '⏳' : '🔄'}
+      </button>
     </div>
   );
 };

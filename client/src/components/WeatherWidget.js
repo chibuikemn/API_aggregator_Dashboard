@@ -1,23 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { WeatherSkeleton } from './LoadingSkeleton';
 import ErrorState from './ErrorState';
+import StatusIndicator from './StatusIndicator';
 
 const WeatherWidget = () => {
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [city, setCity] = useState('Dallas');
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [status, setStatus] = useState('loading');
 
   const fetchWeather = async (cityName = city) => {
     try {
       setLoading(true);
       setError(null);
+      setStatus('loading');
       const response = await fetch(`http://localhost:5000/api/weather?city=${cityName}`);
       if (!response.ok) throw new Error('Failed to fetch weather');
       const data = await response.json();
       setWeather(data);
+      setLastUpdated(new Date());
+      setStatus('online');
     } catch (err) {
       setError(err.message);
+      setStatus('offline');
     } finally {
       setLoading(false);
     }
@@ -39,8 +46,11 @@ const WeatherWidget = () => {
 
   return (
     <div className="card">
-      <div className="card-header">
-        <h3>Weather</h3>
+      <div className="card-header-with-status">
+        <div className="card-title-section">
+          <h3>🌤️ Weather</h3>
+          <StatusIndicator status={status} lastUpdated={lastUpdated} />
+        </div>
         <input
           type="text"
           placeholder="Enter city..."
@@ -65,17 +75,17 @@ const WeatherWidget = () => {
           </div>
           
           <div className="weather-details">
-            <div className="detail-item">
-              <span>Feels like</span>
-              <span>{Math.round(weather.feelsLike)}°C</span>
+            <div className="metric-card">
+              <div className="metric-value">{Math.round(weather.feelsLike)}°</div>
+              <div className="metric-label">Feels like</div>
             </div>
-            <div className="detail-item">
-              <span>Humidity</span>
-              <span>{weather.humidity}%</span>
+            <div className="metric-card">
+              <div className="metric-value">{weather.humidity}%</div>
+              <div className="metric-label">Humidity</div>
             </div>
-            <div className="detail-item">
-              <span>Wind</span>
-              <span>{weather.windSpeed} m/s</span>
+            <div className="metric-card">
+              <div className="metric-value">{weather.windSpeed}</div>
+              <div className="metric-label">Wind (m/s)</div>
             </div>
           </div>
         </div>

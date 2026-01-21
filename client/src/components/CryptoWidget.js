@@ -3,6 +3,7 @@ import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import { cryptoService } from '../services/cryptoService';
 import { CardSkeleton } from './LoadingSkeleton';
 import ErrorState from './ErrorState';
+import StatusIndicator from './StatusIndicator';
 
 const CryptoWidget = () => {
   const [prices, setPrices] = useState([]);
@@ -10,17 +11,23 @@ const CryptoWidget = () => {
   const [selectedCoin, setSelectedCoin] = useState('bitcoin');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [status, setStatus] = useState('loading');
 
   const fetchPrices = async () => {
     try {
+      setStatus('loading');
       console.log('Fetching prices...');
       const result = await cryptoService.getPrices();
       console.log('Prices result:', result);
       setPrices(result.data || []);
       setError(null);
+      setLastUpdated(new Date());
+      setStatus('online');
     } catch (error) {
       console.error('Failed to fetch crypto prices:', error);
       setError('Failed to load prices');
+      setStatus('offline');
     }
   };
 
@@ -58,8 +65,11 @@ const CryptoWidget = () => {
 
   return (
     <div className="card">
-      <div className="card-header">
-        <h3>Live Crypto Prices</h3>
+      <div className="card-header-with-status">
+        <div className="card-title-section">
+          <h3>💰 Live Crypto Prices</h3>
+          <StatusIndicator status={status} lastUpdated={lastUpdated} />
+        </div>
       </div>
       
       {prices.length === 0 ? (
@@ -85,11 +95,13 @@ const CryptoWidget = () => {
       )}
 
       <div className="chart-container">
-        <h4>{selectedCoin.charAt(0).toUpperCase() + selectedCoin.slice(1)} - 24h Chart</h4>
+        <h4>📈 {selectedCoin.charAt(0).toUpperCase() + selectedCoin.slice(1)} - 24h Chart</h4>
         {chartData.length === 0 ? (
-          <div>No chart data available</div>
+          <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
+            No chart data available
+          </div>
         ) : (
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height={200}>
             <LineChart data={chartData}>
               <XAxis 
                 dataKey="timestamp" 
@@ -101,8 +113,9 @@ const CryptoWidget = () => {
                 type="monotone" 
                 dataKey="price" 
                 stroke="var(--primary)" 
-                strokeWidth={2}
+                strokeWidth={3}
                 dot={false}
+                strokeLinecap="round"
               />
             </LineChart>
           </ResponsiveContainer>
