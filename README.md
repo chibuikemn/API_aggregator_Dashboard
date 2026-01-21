@@ -11,9 +11,11 @@ npm install
 
 1. Copy `server/.env.example` to `server/.env`
 2. Get a free API key from [OpenWeatherMap](https://openweathermap.org/api)
-3. Add your API key to `server/.env`:
+3. Get a free API key from [NewsAPI](https://newsapi.org/)
+4. Add your API keys to `server/.env`:
    ```
-   WEATHER_API_KEY=your_actual_api_key
+   WEATHER_API_KEY=your_actual_weather_key
+   NEWS_API_KEY=your_actual_news_key
    ```
 
 ## Run
@@ -29,6 +31,10 @@ Server runs on `http://localhost:5000`
 
 - Health check: `http://localhost:5000/api/health` - should return `{"status":"OK"}`
 - Weather API: `http://localhost:5000/api/weather?city=Dallas`
+- News API: `http://localhost:5000/api/news?topic=tech`
+- News with pagination: `http://localhost:5000/api/news?topic=tech&page=1&pageSize=5`
+- Crypto prices: `http://localhost:5000/api/crypto/prices`
+- Crypto chart: `http://localhost:5000/api/crypto/chart/bitcoin?days=1`
 
 ## Environment
 
